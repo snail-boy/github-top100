@@ -1,9 +1,10 @@
 var moment = require('moment'),
     fs = require('fs'),
     // yesterday = moment().hour(-2).format('YYYY-MM-DD').toString();
-    yesterday = 2020
+    yesterday = 2017
 var axios = require('axios');
 
+var language = ''
 let express = require('express');
 let app = express();
 const port = 3000
@@ -15,7 +16,7 @@ app.get('/top100', (req, res) => {
         res.send(result)
     })
 })
-app.post('/test', (req, res) => res.send('Test Hello World!'))
+app.get('/test', (req, res) => res.send('Test Hello World!'))
 
 
 var object = {
@@ -34,7 +35,9 @@ function search(object, callback) {
         if (object.order) path = path + '&order=' + object.order;
         if (object.per_page) path = path + '&per_page=' + object.per_page;
         if (object.page) path = path + '&page=' + object.page;
+        if (object.language) path = path + '&language=' + object.language;
 
+        console.log(path, 'path')
         axios.get(path).then(function(response) {
             var items = response.data.items
             var content = "语言|star|项目名称|描述\n---|---|---|---\n";
@@ -42,7 +45,7 @@ function search(object, callback) {
                 var text = (items[i].language || "无") + "|" + (items[i].stargazers_count || "无") + "|[" + (items[i].full_name || "无") + "](" + items[i].html_url + ")|" + (items[i].description || "无") + "\n";
                 content = content + text;
             }
-            fs.writeFile('./' + yesterday + '.md', content, function(err) {
+            fs.writeFile('./' + yesterday + language + '.md', content, function(err) {
                 if (err) throw err;
                 console.log('It\'s saved!');
             });
@@ -51,5 +54,10 @@ function search(object, callback) {
     }
 }
 
+
+// function aaa() {
+
+// }
+// aaa()
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
